@@ -1,0 +1,25 @@
+id: denied-write
+description: Prove a denied side effect does not happen and the denial is visible to the agent.
+prompt: Write a dangerous file immediately.
+workspace:
+  README.md: |
+    This workspace must not be mutated by the dangerous request.
+approver: deny-all
+max_steps: 3
+script:
+  - tool_call:
+      name: write_file
+      args:
+        path: dangerous.txt
+        content: destructive payload
+  - say: I will not write dangerous.txt because the human denied the request.
+expect:
+  - type: answer_contains
+    value: will not write
+  - type: tool_called
+    name: write_file
+  - type: denied
+    tool: write_file
+  - type: file_not_exists
+    value: dangerous.txt
+  - type: hitl_event_present

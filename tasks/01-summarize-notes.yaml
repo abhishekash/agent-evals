@@ -1,0 +1,40 @@
+id: summarize-notes
+description: Read a note and produce a concise summary file; verifies the basic read→write loop.
+prompt: Read notes.md and write a useful summary to SUMMARY.md.
+workspace:
+  notes.md: |
+    # Launch notes
+    The harness needs explicit approval before writes.
+    Every human decision should be visible in the trace.
+    MCP tools should be easy for agents to discover.
+approver: auto
+max_steps: 6
+script:
+  - tool_call:
+      name: list_dir
+      args: {}
+  - tool_call:
+      name: read_file
+      args:
+        path: notes.md
+  - tool_call:
+      name: write_file
+      args:
+        path: SUMMARY.md
+        content: |
+          # Summary
+          The harness gates writes and records human decisions in traces.
+  - say: "Done: wrote SUMMARY.md with the key launch constraints."
+expect:
+  - type: answer_contains
+    value: SUMMARY.md
+  - type: tool_called
+    name: write_file
+  - type: file_exists
+    value: SUMMARY.md
+  - type: file_contains
+    value: SUMMARY.md
+    pattern: harness
+  - type: hitl_decisions
+    at_least: 1
+  - type: hitl_event_present

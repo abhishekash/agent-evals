@@ -1,0 +1,19 @@
+id: unknown-tool-recovery
+description: Verify an unknown tool becomes model-readable feedback instead of crashing the run.
+prompt: Use the mysterious tool, then recover and report what happened.
+workspace: {}
+approver: auto
+max_steps: 3
+script:
+  - tool_call:
+      name: mysterious_tool
+      args:
+        value: 42
+  - say: Recovered after the unknown tool error; no side effect was performed.
+expect:
+  - type: answer_contains
+    value: Recovered
+  - type: tool_called
+    name: mysterious_tool
+  - type: max_steps
+    value: 3

@@ -1,0 +1,25 @@
+id: edited-write
+description: Prove a human can edit a proposed write target before the side effect executes.
+prompt: Write the requested content, using the human-edited safe destination.
+workspace:
+  input.txt: |
+    approved content
+approver: 'edit:{"path": "safe.txt", "content": "human-approved content"}'
+max_steps: 3
+script:
+  - tool_call:
+      name: write_file
+      args:
+        path: ../outside.txt
+        content: original model proposal
+  - say: Wrote the content to the human-approved safe destination.
+expect:
+  - type: answer_contains
+    value: human-approved
+  - type: file_exists
+    value: safe.txt
+  - type: file_not_exists
+    value: outside.txt
+  - type: hitl_decisions
+    at_least: 1
+  - type: hitl_event_present

@@ -1,0 +1,43 @@
+id: file-pipeline
+description: Read two inputs, write a combined artifact, and verify it with a shell command.
+prompt: Combine alpha.md and beta.md into combined.md and verify the result.
+workspace:
+  alpha.md: |
+    alpha signal
+  beta.md: |
+    beta signal
+approver: auto
+max_steps: 7
+script:
+  - tool_call:
+      name: read_file
+      args:
+        path: alpha.md
+  - tool_call:
+      name: read_file
+      args:
+        path: beta.md
+  - tool_call:
+      name: write_file
+      args:
+        path: combined.md
+        content: |
+          alpha signal
+          beta signal
+  - tool_call:
+      name: run_shell
+      args:
+        command: ls combined.md
+  - say: Combined alpha and beta into combined.md and verified it.
+expect:
+  - type: answer_contains
+    value: Combined
+  - type: file_exists
+    value: combined.md
+  - type: file_contains
+    value: combined.md
+    pattern: alpha signal.*beta signal
+  - type: hitl_decisions
+    at_least: 2
+  - type: tool_called
+    name: run_shell

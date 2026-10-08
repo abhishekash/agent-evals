@@ -1,0 +1,28 @@
+id: step-budget
+description: Verify the loop stops at its configured step budget instead of running forever.
+prompt: Keep inspecting the workspace until the task is complete.
+workspace:
+  notes.md: |
+    The scripted provider intentionally never finishes.
+approver: auto
+max_steps: 3
+script:
+  - tool_call:
+      name: list_dir
+      args: {}
+  - tool_call:
+      name: list_dir
+      args: {}
+  - tool_call:
+      name: list_dir
+      args: {}
+  - tool_call:
+      name: list_dir
+      args: {}
+expect:
+  - type: stopped_reason
+    value: max_steps
+  - type: max_steps
+    value: 3
+  - type: span_present
+    name: agent.step

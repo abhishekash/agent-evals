@@ -1,0 +1,29 @@
+id: verify-with-shell
+description: Use a read tool and an allowlisted shell command to verify a workspace artifact.
+prompt: Inspect notes.md and verify its line count with a shell command.
+workspace:
+  notes.md: |
+    one
+    two
+    three
+approver: auto
+max_steps: 4
+script:
+  - tool_call:
+      name: read_file
+      args:
+        path: notes.md
+  - tool_call:
+      name: run_shell
+      args:
+        command: wc -l notes.md
+  - say: Verified notes.md line count with the allowlisted shell tool.
+expect:
+  - type: answer_contains
+    value: Verified
+  - type: tool_called
+    name: run_shell
+  - type: hitl_decisions
+    at_least: 1
+  - type: max_steps
+    value: 4

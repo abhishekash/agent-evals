@@ -1,0 +1,15 @@
+id: token-budget
+description: Keep a trivial task under a deterministic token budget.
+prompt: Say hello and stop.
+workspace: {}
+approver: auto
+max_steps: 2
+script:
+  - say: Hello — completed in one model turn.
+expect:
+  - type: answer_contains
+    value: completed
+  - type: max_tokens
+    value: 300
+  - type: max_steps
+    value: 2
