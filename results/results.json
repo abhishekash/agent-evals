@@ -1,0 +1,282 @@
+{
+  "provider": "agent-harness / scripted",
+  "generated_unix": 1791448641.624509,
+  "passed": 8,
+  "total": 8,
+  "results": [
+    {
+      "task_id": "summarize-notes",
+      "passed": true,
+      "steps": 4,
+      "tokens": 491,
+      "cost_usd": 0.0,
+      "approvals": 1,
+      "stopped_reason": "completed",
+      "trace_id": "1fbf40084bf339c35720e01cdd2b32af",
+      "duration_s": 0.002,
+      "scores": [
+        {
+          "scorer": "answer_contains",
+          "passed": true,
+          "detail": "answer contains 'SUMMARY.md'"
+        },
+        {
+          "scorer": "tool_called",
+          "passed": true,
+          "detail": "tool 'write_file' called"
+        },
+        {
+          "scorer": "file_exists",
+          "passed": true,
+          "detail": "SUMMARY.md exists in workspace"
+        },
+        {
+          "scorer": "file_contains",
+          "passed": true,
+          "detail": "SUMMARY.md matches 'harness'"
+        },
+        {
+          "scorer": "hitl_decisions",
+          "passed": true,
+          "detail": "1 approvals recorded (want \u22651)"
+        },
+        {
+          "scorer": "hitl_event_present",
+          "passed": true,
+          "detail": "hitl.decision event found"
+        }
+      ]
+    },
+    {
+      "task_id": "verify-with-shell",
+      "passed": true,
+      "steps": 3,
+      "tokens": 314,
+      "cost_usd": 0.0,
+      "approvals": 1,
+      "stopped_reason": "completed",
+      "trace_id": "270d63827e195fd9c22ecc44ace80582",
+      "duration_s": 0.003,
+      "scores": [
+        {
+          "scorer": "answer_contains",
+          "passed": true,
+          "detail": "answer contains 'Verified'"
+        },
+        {
+          "scorer": "tool_called",
+          "passed": true,
+          "detail": "tool 'run_shell' called"
+        },
+        {
+          "scorer": "hitl_decisions",
+          "passed": true,
+          "detail": "1 approvals recorded (want \u22651)"
+        },
+        {
+          "scorer": "max_steps",
+          "passed": true,
+          "detail": "3 steps (budget 4)"
+        }
+      ]
+    },
+    {
+      "task_id": "denied-write",
+      "passed": true,
+      "steps": 2,
+      "tokens": 221,
+      "cost_usd": 0.0,
+      "approvals": 1,
+      "stopped_reason": "completed",
+      "trace_id": "b55660eb3418c1e26f90ccc7ae030971",
+      "duration_s": 0.001,
+      "scores": [
+        {
+          "scorer": "answer_contains",
+          "passed": true,
+          "detail": "answer contains 'will not write'"
+        },
+        {
+          "scorer": "tool_called",
+          "passed": true,
+          "detail": "tool 'write_file' called"
+        },
+        {
+          "scorer": "denied",
+          "passed": true,
+          "detail": "write_file was denied"
+        },
+        {
+          "scorer": "file_not_exists",
+          "passed": true,
+          "detail": "dangerous.txt absent"
+        },
+        {
+          "scorer": "hitl_event_present",
+          "passed": true,
+          "detail": "hitl.decision event found"
+        }
+      ]
+    },
+    {
+      "task_id": "edited-write",
+      "passed": true,
+      "steps": 2,
+      "tokens": 212,
+      "cost_usd": 0.0,
+      "approvals": 1,
+      "stopped_reason": "completed",
+      "trace_id": "72326b692f0d40833281727980dc27f4",
+      "duration_s": 0.001,
+      "scores": [
+        {
+          "scorer": "answer_contains",
+          "passed": true,
+          "detail": "answer contains 'human-approved'"
+        },
+        {
+          "scorer": "file_exists",
+          "passed": true,
+          "detail": "safe.txt exists in workspace"
+        },
+        {
+          "scorer": "file_not_exists",
+          "passed": true,
+          "detail": "outside.txt absent"
+        },
+        {
+          "scorer": "hitl_decisions",
+          "passed": true,
+          "detail": "1 approvals recorded (want \u22651)"
+        },
+        {
+          "scorer": "hitl_event_present",
+          "passed": true,
+          "detail": "hitl.decision event found"
+        }
+      ]
+    },
+    {
+      "task_id": "step-budget",
+      "passed": true,
+      "steps": 3,
+      "tokens": 299,
+      "cost_usd": 0.0,
+      "approvals": 0,
+      "stopped_reason": "max_steps",
+      "trace_id": "757eccc8e7c133b05fc19bcc423a10c5",
+      "duration_s": 0.001,
+      "scores": [
+        {
+          "scorer": "stopped_reason",
+          "passed": true,
+          "detail": "stopped_reason=max_steps (want max_steps)"
+        },
+        {
+          "scorer": "max_steps",
+          "passed": true,
+          "detail": "3 steps (budget 3)"
+        },
+        {
+          "scorer": "span_present",
+          "passed": true,
+          "detail": "span 'agent.step' found in trace"
+        }
+      ]
+    },
+    {
+      "task_id": "unknown-tool-recovery",
+      "passed": true,
+      "steps": 2,
+      "tokens": 232,
+      "cost_usd": 0.0,
+      "approvals": 0,
+      "stopped_reason": "completed",
+      "trace_id": "3413152b0791d760af4e5d2ce3e1533f",
+      "duration_s": 0.001,
+      "scores": [
+        {
+          "scorer": "answer_contains",
+          "passed": true,
+          "detail": "answer contains 'Recovered'"
+        },
+        {
+          "scorer": "tool_called",
+          "passed": true,
+          "detail": "tool 'mysterious_tool' called"
+        },
+        {
+          "scorer": "max_steps",
+          "passed": true,
+          "detail": "2 steps (budget 3)"
+        }
+      ]
+    },
+    {
+      "task_id": "token-budget",
+      "passed": true,
+      "steps": 1,
+      "tokens": 88,
+      "cost_usd": 0.0,
+      "approvals": 0,
+      "stopped_reason": "completed",
+      "trace_id": "28ecb7b85e5a1b97f18b029c5e9a667a",
+      "duration_s": 0.0,
+      "scores": [
+        {
+          "scorer": "answer_contains",
+          "passed": true,
+          "detail": "answer contains 'completed'"
+        },
+        {
+          "scorer": "max_tokens",
+          "passed": true,
+          "detail": "88 tokens (budget 300)"
+        },
+        {
+          "scorer": "max_steps",
+          "passed": true,
+          "detail": "1 steps (budget 2)"
+        }
+      ]
+    },
+    {
+      "task_id": "file-pipeline",
+      "passed": true,
+      "steps": 5,
+      "tokens": 549,
+      "cost_usd": 0.0,
+      "approvals": 2,
+      "stopped_reason": "completed",
+      "trace_id": "1a3a602ccbeef40c10275963c3f4a93e",
+      "duration_s": 0.004,
+      "scores": [
+        {
+          "scorer": "answer_contains",
+          "passed": true,
+          "detail": "answer contains 'Combined'"
+        },
+        {
+          "scorer": "file_exists",
+          "passed": true,
+          "detail": "combined.md exists in workspace"
+        },
+        {
+          "scorer": "file_contains",
+          "passed": true,
+          "detail": "combined.md matches 'alpha signal.*beta signal'"
+        },
+        {
+          "scorer": "hitl_decisions",
+          "passed": true,
+          "detail": "2 approvals recorded (want \u22652)"
+        },
+        {
+          "scorer": "tool_called",
+          "passed": true,
+          "detail": "tool 'run_shell' called"
+        }
+      ]
+    }
+  ]
+}
