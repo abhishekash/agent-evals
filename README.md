@@ -1,5 +1,7 @@
 # agent-evals
 
+[![CI](https://github.com/abhishekash/agent-evals/actions/workflows/ci.yml/badge.svg)](https://github.com/abhishekash/agent-evals/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 **Eval-driven development for agentic systems.** YAML tasks run through [`agent-harness`](https://github.com/abhishekash/agent-harness), produce OpenTelemetry traces, and are scored with deterministic assertions.
 
 Most agent projects show a successful demo. This project asks harder questions:
