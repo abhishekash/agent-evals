@@ -102,6 +102,23 @@ def _hitl_event_present(ctx: RunContext, **_) -> Score:
     return Score("hitl_event_present", ok, "hitl.decision event " + ("found" if ok else "MISSING — gate bypassed?"))
 
 
+def _tool_error(ctx: RunContext, value: str = "", tool: str | None = None, **_) -> Score:
+    matches = []
+    for span in ctx.spans:
+        attrs = span.get("attributes", {})
+        if tool and attrs.get("tool.name") != tool:
+            continue
+        message = str(attrs.get("tool.error_message", ""))
+        if value.lower() in message.lower():
+            matches.append(message)
+    ok = bool(matches)
+    return Score(
+        "tool_error",
+        ok,
+        f"tool error {'found' if ok else 'missing'}{': ' + matches[0] if matches else ''}",
+    )
+
+
 _SCORERS: dict[str, Callable[..., Score]] = {
     "answer_contains": _answer_contains,
     "answer_regex": _answer_regex,
@@ -116,6 +133,7 @@ _SCORERS: dict[str, Callable[..., Score]] = {
     "denied": _denied,
     "span_present": _span_present,
     "hitl_event_present": _hitl_event_present,
+    "tool_error": _tool_error,
 }
 
 

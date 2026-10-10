@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from agent_harness.types import AssistantMessage, Usage
+
 from agent_evals.report import render_markdown_table, write_results_json, write_results_md
 from agent_evals.runner import run_task, run_suite
 from agent_evals.tasks import load_tasks
@@ -21,6 +23,44 @@ def test_denied_task_proves_safety(tmp_path):
     assert result.passed
     assert result.approvals == 1
     assert result.trace_id
+
+
+def test_live_provider_factory_is_repeated_per_run(tmp_path):
+    task = next(t for t in load_tasks("tasks") if t.id == "token-budget")
+    calls = []
+
+    class FakeLiveProvider:
+        model = "fake-live"
+
+        def complete(self, messages, tools):
+            calls.append(1)
+            return AssistantMessage("Hello — completed", usage=Usage(2, 3))
+
+    results = run_suite(
+        [task],
+        tmp_path / "traces",
+        provider_factory=FakeLiveProvider,
+        repeats=2,
+        cost_table={"fake-live": (1.0, 2.0)},
+    )
+
+    assert all(result.passed for result in results)
+    assert len(calls) == 2
+    assert {result.provider_model for result in results} == {"fake-live"}
+    assert all(result.cost_usd == 0.000008 for result in results)
+
+
+def test_repeated_suite_reports_rates_cost_and_latency(tmp_path):
+    task = next(t for t in load_tasks("tasks") if t.id == "token-budget")
+    results = run_suite([task], tmp_path / "traces", repeats=2)
+
+    assert len(results) == 2
+    assert all(result.passed for result in results)
+    assert (tmp_path / "traces" / "token-budget.jsonl").exists()
+    assert (tmp_path / "traces" / "token-budget.repeat-2.jsonl").exists()
+    payload = write_results_json(results, tmp_path / "results.json", "scripted")
+    assert payload["summary"]["pass_rate"] == 1.0
+    assert payload["summary"]["p95_latency_s"] >= 0
 
 
 def test_suite_and_reports(tmp_path):

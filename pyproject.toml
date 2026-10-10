@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "agent-evals"
 version = "0.1.0"
-description = "Eval-driven development for agents: task suites + deterministic scorers run through agent-harness, with traces as the debugging artifact."
+description = "Eval-driven development for agents: deterministic contracts and repeated live-model runs through agent-harness, with traces as the debugging artifact."
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
@@ -25,6 +25,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+anthropic = ["anthropic>=0.40"]
+opencode = ["openai>=1.50"]
 
 [project.scripts]
 agent-evals = "agent_evals.cli:main"

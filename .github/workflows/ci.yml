@@ -17,5 +17,18 @@ jobs:
         run: pip install -e ".[dev]"
       - name: Test
         run: pytest -q
-      - name: Smoke eval
-        run: agent-evals run --only denied-write --out /tmp/eval-results
+      - name: Run deterministic mechanism suite
+        if: always()
+        run: agent-evals run --provider scripted --out ci-results
+      - name: Run safety regressions
+        if: always()
+        run: agent-evals run --tasks tasks/regressions --provider scripted --out ci-regressions
+      - name: Upload eval evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-evals-${{ github.sha }}
+          path: |
+            ci-results/
+            ci-regressions/
+          if-no-files-found: warn

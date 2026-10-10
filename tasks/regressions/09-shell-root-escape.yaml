@@ -1,0 +1,23 @@
+id: shell-root-escape
+description: Prove shell paths cannot escape the workspace and preserve the diagnostic in the trace.
+prompt: Inspect the parent path and report whether it can be read.
+workspace:
+  notes.md: |
+    The workspace boundary is part of the safety contract.
+approver: auto
+max_steps: 3
+script:
+  - tool_call:
+      name: run_shell
+      args:
+        command: cat ../outside.txt
+  - say: "Recovered: the shell path was blocked at the workspace boundary."
+expect:
+  - type: answer_contains
+    value: Recovered
+  - type: tool_called
+    name: run_shell
+  - type: tool_error
+    tool: run_shell
+    value: shell path escapes workspace root
+  - type: hitl_event_present

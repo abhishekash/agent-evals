@@ -1,8 +1,85 @@
 {
   "provider": "agent-harness / scripted",
-  "generated_unix": 1791448641.624509,
+  "generated_unix": 1791650257.5124984,
   "passed": 8,
   "total": 8,
+  "summary": {
+    "passed": 8,
+    "total": 8,
+    "pass_rate": 1.0,
+    "failures": 0,
+    "total_cost_usd": 0.0,
+    "mean_cost_usd": 0.0,
+    "mean_latency_s": 0.0071,
+    "p50_latency_s": 0.007,
+    "p95_latency_s": 0.016,
+    "tasks": {
+      "denied-write": {
+        "passed": 1,
+        "total": 1,
+        "pass_rate": 1.0,
+        "total_cost_usd": 0.0,
+        "mean_latency_s": 0.004,
+        "failures": []
+      },
+      "edited-write": {
+        "passed": 1,
+        "total": 1,
+        "pass_rate": 1.0,
+        "total_cost_usd": 0.0,
+        "mean_latency_s": 0.004,
+        "failures": []
+      },
+      "file-pipeline": {
+        "passed": 1,
+        "total": 1,
+        "pass_rate": 1.0,
+        "total_cost_usd": 0.0,
+        "mean_latency_s": 0.012,
+        "failures": []
+      },
+      "step-budget": {
+        "passed": 1,
+        "total": 1,
+        "pass_rate": 1.0,
+        "total_cost_usd": 0.0,
+        "mean_latency_s": 0.007,
+        "failures": []
+      },
+      "summarize-notes": {
+        "passed": 1,
+        "total": 1,
+        "pass_rate": 1.0,
+        "total_cost_usd": 0.0,
+        "mean_latency_s": 0.016,
+        "failures": []
+      },
+      "token-budget": {
+        "passed": 1,
+        "total": 1,
+        "pass_rate": 1.0,
+        "total_cost_usd": 0.0,
+        "mean_latency_s": 0.002,
+        "failures": []
+      },
+      "unknown-tool-recovery": {
+        "passed": 1,
+        "total": 1,
+        "pass_rate": 1.0,
+        "total_cost_usd": 0.0,
+        "mean_latency_s": 0.004,
+        "failures": []
+      },
+      "verify-with-shell": {
+        "passed": 1,
+        "total": 1,
+        "pass_rate": 1.0,
+        "total_cost_usd": 0.0,
+        "mean_latency_s": 0.008,
+        "failures": []
+      }
+    }
+  },
   "results": [
     {
       "task_id": "summarize-notes",
@@ -12,8 +89,11 @@
       "cost_usd": 0.0,
       "approvals": 1,
       "stopped_reason": "completed",
-      "trace_id": "1fbf40084bf339c35720e01cdd2b32af",
-      "duration_s": 0.002,
+      "trace_id": "931d73a05030a46f4931a6700d09ed58",
+      "duration_s": 0.016,
+      "repeat": 1,
+      "provider_model": "scripted",
+      "error": "",
       "scores": [
         {
           "scorer": "answer_contains",
@@ -55,8 +135,11 @@
       "cost_usd": 0.0,
       "approvals": 1,
       "stopped_reason": "completed",
-      "trace_id": "270d63827e195fd9c22ecc44ace80582",
-      "duration_s": 0.003,
+      "trace_id": "5fccb0ceb2cea768b3a55d6363330cc4",
+      "duration_s": 0.008,
+      "repeat": 1,
+      "provider_model": "scripted",
+      "error": "",
       "scores": [
         {
           "scorer": "answer_contains",
@@ -88,8 +171,11 @@
       "cost_usd": 0.0,
       "approvals": 1,
       "stopped_reason": "completed",
-      "trace_id": "b55660eb3418c1e26f90ccc7ae030971",
-      "duration_s": 0.001,
+      "trace_id": "48b83dcbf6c41d0b2600ed7fad3246e0",
+      "duration_s": 0.004,
+      "repeat": 1,
+      "provider_model": "scripted",
+      "error": "",
       "scores": [
         {
           "scorer": "answer_contains",
@@ -126,8 +212,11 @@
       "cost_usd": 0.0,
       "approvals": 1,
       "stopped_reason": "completed",
-      "trace_id": "72326b692f0d40833281727980dc27f4",
-      "duration_s": 0.001,
+      "trace_id": "2da4007173a32dfb590b86462dc3bc0e",
+      "duration_s": 0.004,
+      "repeat": 1,
+      "provider_model": "scripted",
+      "error": "",
       "scores": [
         {
           "scorer": "answer_contains",
@@ -164,8 +253,11 @@
       "cost_usd": 0.0,
       "approvals": 0,
       "stopped_reason": "max_steps",
-      "trace_id": "757eccc8e7c133b05fc19bcc423a10c5",
-      "duration_s": 0.001,
+      "trace_id": "f5fef74e2c3079a4f86f5ad9c397e32b",
+      "duration_s": 0.007,
+      "repeat": 1,
+      "provider_model": "scripted",
+      "error": "",
       "scores": [
         {
           "scorer": "stopped_reason",
@@ -192,8 +284,11 @@
       "cost_usd": 0.0,
       "approvals": 0,
       "stopped_reason": "completed",
-      "trace_id": "3413152b0791d760af4e5d2ce3e1533f",
-      "duration_s": 0.001,
+      "trace_id": "8c36a3a5b6807b0c4c1057b8ae3d628c",
+      "duration_s": 0.004,
+      "repeat": 1,
+      "provider_model": "scripted",
+      "error": "",
       "scores": [
         {
           "scorer": "answer_contains",
@@ -220,8 +315,11 @@
       "cost_usd": 0.0,
       "approvals": 0,
       "stopped_reason": "completed",
-      "trace_id": "28ecb7b85e5a1b97f18b029c5e9a667a",
-      "duration_s": 0.0,
+      "trace_id": "aa03a676c57141aa58a4d82e60b1de9a",
+      "duration_s": 0.002,
+      "repeat": 1,
+      "provider_model": "scripted",
+      "error": "",
       "scores": [
         {
           "scorer": "answer_contains",
@@ -248,8 +346,11 @@
       "cost_usd": 0.0,
       "approvals": 2,
       "stopped_reason": "completed",
-      "trace_id": "1a3a602ccbeef40c10275963c3f4a93e",
-      "duration_s": 0.004,
+      "trace_id": "d36d9d441c7bf33ca51fca8dffda893b",
+      "duration_s": 0.012,
+      "repeat": 1,
+      "provider_model": "scripted",
+      "error": "",
       "scores": [
         {
           "scorer": "answer_contains",
