@@ -4,6 +4,17 @@
 
 **Eval-driven development for agentic systems.** YAML tasks run through [`agent-harness`](https://github.com/abhishekash/agent-harness), produce OpenTelemetry traces, and are scored with deterministic assertions.
 
+## Where this helps
+
+| AI engineering question | Reproducible check |
+|---|---|
+| Will a coding agent respect a denied write? | `denied-write` asserts the denial, missing file, and trace event. |
+| Will a human correction change the side effect? | `edited-write` checks the executed path after argument editing. |
+| Will a runaway loop stop within its budget? | `step-budget` asserts the stop reason and step limit; `token-budget` checks the token limit. |
+| Can a failed run be diagnosed later? | Every task writes a trace ID and JSONL spans alongside its score. |
+
+These are **runtime contract tests**. The checked-in 8/8 result uses a scripted provider, so it does not measure how often a live model chooses the right action.
+
 Most agent projects show a successful demo. This project asks harder questions:
 
 - Did the agent take the *right* tool path?
