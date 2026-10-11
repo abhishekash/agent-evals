@@ -14,7 +14,14 @@ from pathlib import Path
 from typing import Any, Callable
 
 from agent_harness.agent import Agent
-from agent_harness.hitl import ApprovalPolicy, AutoApprover, CallbackApprover, Decision, DenyAllApprover
+from agent_harness.hitl import (
+    ApprovalPolicy,
+    ApprovalRecord,
+    AutoApprover,
+    CallbackApprover,
+    Decision,
+    DenyAllApprover,
+)
 from agent_harness.providers import ScriptedProvider
 from agent_harness.providers.mock import call_tool, say
 from agent_harness.tools import default_tools
@@ -72,8 +79,39 @@ def _build_approver(task: Task):
     if task.approver == "deny-all":
         return DenyAllApprover()
     if task.approver.startswith("edit:"):
-        edited = json.loads(task.approver[len("edit:"):])
-        return CallbackApprover(lambda req, e=edited: (Decision.EDIT, e), name="edit-fixture")
+        spec = task.approver[len("edit:"):].strip()
+        # Legacy edit:<JSON> tasks mean a write_file edit. New tasks can name
+        # the target explicitly: edit:<tool>:<JSON>. Never apply one tool's
+        # arguments to another tool or auto-approve an unrelated side effect.
+        target = "write_file"
+        if not spec.startswith("{"):
+            target, separator, spec = spec.partition(":")
+            if not separator or not target:
+                raise ValueError(f"task {task.id}: expected edit:<tool>:<JSON object>")
+        edited = json.loads(spec)
+        if not isinstance(edited, dict):
+            raise ValueError(f"task {task.id}: edited arguments must be a JSON object")
+
+        def review(request):
+            if request.tool_name != target:
+                return ApprovalRecord(
+                    request,
+                    Decision.DENY,
+                    approver="edit-fixture",
+                    rationale=(
+                        f"this fixture only permits edits to {target}; "
+                        "use read-only tools for inspection or stop"
+                    ),
+                )
+            return ApprovalRecord(
+                request,
+                Decision.EDIT,
+                approver="edit-fixture",
+                rationale=f"fixture edited {target} arguments",
+                edited_arguments=dict(edited),
+            )
+
+        return CallbackApprover(review, name="edit-fixture")
     raise ValueError(f"task {task.id}: unknown approver {task.approver!r}")
 
 

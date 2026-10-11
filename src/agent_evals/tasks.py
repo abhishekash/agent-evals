@@ -6,7 +6,7 @@ Schema:
     prompt: the user task given to the agent
     workspace:            # files materialized into a temp dir before the run
       notes.md: "# notes\n..."
-    approver: auto        # auto | deny-all | edit:<path-as-json>
+    approver: auto        # auto | deny-all | edit:<tool>:<arguments-as-json>
     max_steps: 10         # optional loop guard (default 10)
     script:               # scripted provider turns (deterministic mode)
       - tool_call: {name: list_dir, args: {}}
@@ -14,6 +14,9 @@ Schema:
     expect:               # scorers
       - {type: answer_contains, value: "done"}
       - {type: file_exists, value: SUMMARY.md}
+
+The legacy edit:<JSON> form targets write_file. Both edit forms deny gated
+calls to other tools rather than approving them or reusing incompatible args.
 """
 from __future__ import annotations
 

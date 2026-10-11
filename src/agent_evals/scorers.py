@@ -92,14 +92,39 @@ def _denied(ctx: RunContext, tool: str, **_) -> Score:
     return Score("denied", denied, f"{tool} {'was' if denied else 'was NOT'} denied")
 
 
+def _edited(ctx: RunContext, tool: str, **_) -> Score:
+    """A non-no-op edit was recorded for the requested tool, not just any gate."""
+    edited = any(
+        record.request.tool_name == tool
+        and record.decision.value == "edit"
+        and record.edited_arguments is not None
+        and record.edited_arguments != record.request.arguments
+        for record in ctx.result.approvals
+    )
+    return Score("edited", edited, f"{tool} arguments {'were' if edited else 'were NOT'} changed at the gate")
+
+
 def _span_present(ctx: RunContext, name: str, **_) -> Score:
     ok = any(s["name"] == name for s in ctx.spans)
     return Score("span_present", ok, f"span {name!r} {'found' if ok else 'missing'} in trace")
 
 
-def _hitl_event_present(ctx: RunContext, **_) -> Score:
-    ok = any(e["name"] == "hitl.decision" for s in ctx.spans for e in s.get("events", []))
-    return Score("hitl_event_present", ok, "hitl.decision event " + ("found" if ok else "MISSING — gate bypassed?"))
+def _hitl_event_present(
+    ctx: RunContext, tool: str | None = None, decision: str | None = None, **_
+) -> Score:
+    ok = any(
+        event["name"] == "hitl.decision"
+        and (tool is None or span.get("attributes", {}).get("tool.name") == tool)
+        and (decision is None or event.get("attributes", {}).get("hitl.decision") == decision)
+        for span in ctx.spans
+        for event in span.get("events", [])
+    )
+    detail = "hitl.decision event " + ("found" if ok else "missing")
+    if tool is not None:
+        detail += f" for tool={tool}"
+    if decision is not None:
+        detail += f" decision={decision}"
+    return Score("hitl_event_present", ok, detail)
 
 
 def _tool_error(ctx: RunContext, value: str = "", tool: str | None = None, **_) -> Score:
@@ -131,6 +156,7 @@ _SCORERS: dict[str, Callable[..., Score]] = {
     "stopped_reason": _stopped_reason,
     "hitl_decisions": _hitl_decisions,
     "denied": _denied,
+    "edited": _edited,
     "span_present": _span_present,
     "hitl_event_present": _hitl_event_present,
     "tool_error": _tool_error,

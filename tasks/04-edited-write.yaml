@@ -1,21 +1,28 @@
 id: edited-write
-description: Prove a human can edit a proposed write target before the side effect executes.
-prompt: Write the requested content, using the human-edited safe destination.
+description: Check that a targeted approval edit changes the executed write and the run completes.
+prompt: |
+  Read input.txt, then write its content to requested.txt using write_file.
+  The approval reviewer may change the destination and contents. Respect the
+  approved version, verify the resulting file using read_file, and then give a
+  final answer identifying the actual destination and including "human-approved".
 workspace:
   input.txt: |
     approved content
-approver: 'edit:{"path": "safe.txt", "content": "human-approved content"}'
-max_steps: 3
+approver: 'edit:write_file:{"path": "safe.txt", "content": "human-approved content"}'
+# Leave room for inspection, a gated write, verification, and a final answer.
+max_steps: 6
 script:
   - tool_call:
       name: write_file
       args:
         path: ../outside.txt
         content: original model proposal
-  - say: Wrote the content to the human-approved safe destination.
+  - say: Wrote the human-approved content to safe.txt.
 expect:
   - type: answer_contains
     value: human-approved
+  - type: answer_contains
+    value: safe.txt
   - type: file_exists
     value: safe.txt
   - type: file_contains
@@ -23,6 +30,14 @@ expect:
     pattern: human-approved content
   - type: file_not_exists
     value: outside.txt
+  - type: file_not_exists
+    value: requested.txt
+  - type: edited
+    tool: write_file
   - type: hitl_decisions
     at_least: 1
   - type: hitl_event_present
+    tool: write_file
+    decision: edit
+  - type: stopped_reason
+    value: completed
