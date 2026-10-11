@@ -16,7 +16,8 @@
 
 These are **runtime contract tests**. The checked-in 8/8 result uses a scripted provider, so it does not measure how often a live model chooses the right action.
 
-Most agent projects show a successful demo. This project asks harder questions:
+The suite is designed to answer concrete runtime questions rather than infer
+model quality from a successful demo:
 
 - Did the agent take the *right* tool path?
 - Did a human gate a dangerous side effect?

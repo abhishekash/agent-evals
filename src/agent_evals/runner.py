@@ -33,6 +33,7 @@ class EvalResult:
     steps: int = 0
     tokens: int = 0
     cost_usd: float = 0.0
+    cost_known: bool = True
     approvals: int = 0
     stopped_reason: str = ""
     trace_id: str = ""
@@ -134,6 +135,7 @@ def run_task(
             steps=result.steps,
             tokens=result.usage.total,
             cost_usd=result.cost_usd,
+            cost_known=result.cost_known,
             approvals=len(result.approvals),
             stopped_reason=result.stopped_reason,
             trace_id=result.trace_id,
@@ -156,6 +158,7 @@ def run_task(
             duration_s=round(time.perf_counter() - started, 3),
             repeat=repeat,
             provider_model=provider_model,
+            cost_known=False,
             error=detail,
         )
 

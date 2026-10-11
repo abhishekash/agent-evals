@@ -18,6 +18,9 @@ expect:
     value: human-approved
   - type: file_exists
     value: safe.txt
+  - type: file_contains
+    value: safe.txt
+    pattern: human-approved content
   - type: file_not_exists
     value: outside.txt
   - type: hitl_decisions

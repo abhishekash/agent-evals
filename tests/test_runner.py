@@ -50,6 +50,23 @@ def test_live_provider_factory_is_repeated_per_run(tmp_path):
     assert all(result.cost_usd == 0.000008 for result in results)
 
 
+def test_unknown_pricing_is_reported_as_unknown(tmp_path):
+    task = next(t for t in load_tasks("tasks") if t.id == "token-budget")
+
+    class UnpricedProvider:
+        model = "unpriced-model"
+
+        def complete(self, messages, tools):
+            return AssistantMessage("Hello — completed", usage=Usage(2, 3))
+
+    result = run_task(task, tmp_path / "traces", provider=UnpricedProvider())
+    assert result.passed
+    assert not result.cost_known
+    payload = write_results_json([result], tmp_path / "results.json", "unpriced-model")
+    assert payload["summary"]["total_cost_usd"] is None
+    assert "unknown" in render_markdown_table([result])
+
+
 def test_repeated_suite_reports_rates_cost_and_latency(tmp_path):
     task = next(t for t in load_tasks("tasks") if t.id == "token-budget")
     results = run_suite([task], tmp_path / "traces", repeats=2)
