@@ -66,18 +66,28 @@ agent-evals run \
   --out results/live
 ```
 
-The default endpoint is OpenCode Go at `https://opencode.ai/zen/go/v1`.
-Override it with
-`OPENCODE_BASE_URL` or `--base-url`; use `--api-key-env` when the credential
-has a different environment-variable name. Do not put the API key in task
-files, command arguments, or committed configuration.
+`--provider opencode` uses [OpenCode Go](https://opencode.ai/docs/go/) by
+default: `https://opencode.ai/zen/go/v1`, model `mimo-v2.6-pro`. The `zen`
+segment is part of Go's documented URL; it is not the Zen-only route
+`https://opencode.ai/zen/v1`. Use a Go-enabled key. This adapter currently
+supports Go models with a **chat-completions** endpoint, not those requiring
+Responses or Anthropic Messages.
 
-The older Zen endpoint and free-tier credentials may be limited to requests
-made from the OpenCode application. Those credentials return HTTP 403 with
-`FreeTierError` when used through an external API adapter. This project uses
-OpenCode Go by default; use an OpenCode Go-enabled key and model, or point
-`--base-url` at another authenticated OpenAI-compatible endpoint. Do not try
-to bypass a provider's client restriction with spoofed headers.
+Override the URL with `OPENCODE_BASE_URL` or `--base-url`, and the model with
+`OPENCODE_MODEL` or `--model`. CLI-style `opencode-go/<model-id>` names are
+accepted and normalized to the API's bare model ID. Use `--api-key-env` when
+the credential has a different environment-variable name. Do not put the API
+key in task files, command arguments, or committed configuration.
+
+Go's external-client guidance asks for an honest client User-Agent and a stable
+conversation ID. The harness sends `agent-harness/<version>` and
+`x-opencode-session` on every model/summary request, with a fresh session per
+evaluation attempt. It does not impersonate the OpenCode application.
+
+The former default selected the Zen-only free model `big-pickle`. That route
+can return HTTP 403 `FreeTierError` from an external client; the error does
+**not** establish that your key lacks a Go subscription. Confirm the URL and
+model before diagnosing account access. No fallback to Zen is automatic.
 
 Live mode intentionally uses the same YAML tasks and deterministic scorers as
 the mechanism suite. A failing task is recorded and the suite continues so a
@@ -93,6 +103,9 @@ Outputs:
 - `results/RESULTS.md` — generated report with aggregate and per-run metrics
 - `results/traces/<task>.jsonl` — OTel spans for debugging the run
 - `results/traces/<task>.repeat-<n>.jsonl` — additional live repetitions
+
+Reports under `results/live*/` are ignored by Git. Keep live results local
+until they have been explicitly reviewed and redacted for publication.
 
 ## Latest deterministic baseline
 

@@ -13,7 +13,9 @@ from agent_evals.tasks import load_tasks
 
 def _selected_model(args) -> str:
     if args.provider == "opencode":
-        model = args.model or os.getenv("OPENCODE_MODEL", "mimo-v2.6-pro")
+        from agent_harness.providers.opencode import DEFAULT_MODEL
+
+        model = args.model or os.getenv("OPENCODE_MODEL", DEFAULT_MODEL)
         for prefix in ("opencode-go/", "opencode/"):
             if model.startswith(prefix):
                 model = model[len(prefix):]

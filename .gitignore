@@ -11,3 +11,5 @@ htmlcov/
 traces/
 runs.jsonl
 .env
+# Live reports are local evidence; publish only after explicit review/redaction.
+results/live*/
