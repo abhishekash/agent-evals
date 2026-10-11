@@ -12,10 +12,14 @@ from agent_evals.tasks import load_tasks
 
 
 def _selected_model(args) -> str:
+    if args.provider == "opencode":
+        model = args.model or os.getenv("OPENCODE_MODEL", "mimo-v2.6-pro")
+        for prefix in ("opencode-go/", "opencode/"):
+            if model.startswith(prefix):
+                model = model[len(prefix):]
+        return model
     if args.model:
         return args.model
-    if args.provider == "opencode":
-        return os.getenv("OPENCODE_MODEL", "big-pickle")
     if args.provider == "anthropic":
         return "claude-sonnet-4-5-20250929"
     return "scripted"

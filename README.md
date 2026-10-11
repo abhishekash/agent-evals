@@ -61,21 +61,23 @@ pip install -e ".[dev,opencode]"
 export OPENCODE_API_KEY="..."
 agent-evals run \
   --provider opencode \
-  --model "${OPENCODE_MODEL:-big-pickle}" \
+  --model "${OPENCODE_MODEL:-mimo-v2.6-pro}" \
   --repeats 3 \
   --out results/live
 ```
 
-The default endpoint is `https://opencode.ai/zen/v1`. Override it with
+The default endpoint is OpenCode Go at `https://opencode.ai/zen/go/v1`.
+Override it with
 `OPENCODE_BASE_URL` or `--base-url`; use `--api-key-env` when the credential
 has a different environment-variable name. Do not put the API key in task
 files, command arguments, or committed configuration.
 
-Some OpenCode credentials are limited to requests made from the OpenCode
-application. Those credentials return HTTP 403 with `FreeTierError` when used
-through this external API adapter. Use an API-enabled/paid key, or point
-`--base-url` at another authenticated OpenAI-compatible endpoint; do not try
-to bypass the provider's client restriction with spoofed headers.
+The older Zen endpoint and free-tier credentials may be limited to requests
+made from the OpenCode application. Those credentials return HTTP 403 with
+`FreeTierError` when used through an external API adapter. This project uses
+OpenCode Go by default; use an OpenCode Go-enabled key and model, or point
+`--base-url` at another authenticated OpenAI-compatible endpoint. Do not try
+to bypass a provider's client restriction with spoofed headers.
 
 Live mode intentionally uses the same YAML tasks and deterministic scorers as
 the mechanism suite. A failing task is recorded and the suite continues so a
