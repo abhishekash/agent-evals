@@ -36,6 +36,7 @@ model quality from a successful demo:
 # Install (uv is recommended; pip works too)
 uv venv
 uv pip install -e ".[dev]"
+source .venv/bin/activate
 
 # Run all eight deterministic tasks — no API key, no network at evaluation time
 agent-evals run --provider scripted
@@ -46,6 +47,10 @@ Run one task while developing:
 ```bash
 agent-evals run --only denied-write --out /tmp/eval-results
 ```
+
+If the shell says `agent-evals: command not found`, either activate the
+project environment with `source .venv/bin/activate` or invoke the installed
+entry point directly as `.venv/bin/agent-evals`.
 
 Run the same task suite against an OpenCode-compatible model. Each repetition
 gets a fresh client and isolated workspace; every attempt keeps its trace,
