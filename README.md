@@ -71,6 +71,12 @@ The default endpoint is `https://opencode.ai/zen/v1`. Override it with
 has a different environment-variable name. Do not put the API key in task
 files, command arguments, or committed configuration.
 
+Some OpenCode credentials are limited to requests made from the OpenCode
+application. Those credentials return HTTP 403 with `FreeTierError` when used
+through this external API adapter. Use an API-enabled/paid key, or point
+`--base-url` at another authenticated OpenAI-compatible endpoint; do not try
+to bypass the provider's client restriction with spoofed headers.
+
 Live mode intentionally uses the same YAML tasks and deterministic scorers as
 the mechanism suite. A failing task is recorded and the suite continues so a
 single model failure cannot hide the rest of the evidence. The exit code is
