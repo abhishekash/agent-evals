@@ -180,6 +180,16 @@ and `stopped_reason: completed`. An incomplete run still fails even if the
 file was written. Preserve the original failed trial; a rerun with this new
 prompt/budget is a **new task revision**, not a retroactive pass.
 
+### Live-provider trial
+
+On 2026-10-11, the revised `edited-write-v2` task was run once against
+OpenCode Go's `mimo-v2.6-pro` model. It passed all 10 scorers in 4 steps with
+3,096 tokens, one edited approval, and `stopped_reason: completed`; the run
+took 25.672 seconds and cost $0.00151945. This is evidence that the revised
+approval and side-effect contract works on one real model run. It is not a
+benchmark: one task and one repetition cannot support a general model-quality
+claim. Repeat the trial before comparing providers or reporting a pass rate.
+
 ## Debugging story: a shell escape becomes a traceable regression
 
 A concrete boundary failure is now covered by

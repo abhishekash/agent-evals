@@ -27,6 +27,7 @@ dependencies = [
 dev = ["pytest>=8"]
 anthropic = ["anthropic>=0.40"]
 opencode = ["openai>=1.50"]
+langgraph-experiment = ["langgraph>=1.0,<2"]
 
 [project.scripts]
 agent-evals = "agent_evals.cli:main"

@@ -1,0 +1,10 @@
+{
+  "protocol_revision": "retrieval-pilot-v1",
+  "task_revision": "retrieval-loop-v1",
+  "scorer_revision": "exact-key-citation-v1",
+  "planned_trials_per_arm": 20,
+  "minimum_candidate_passes": 18,
+  "minimum_pass_gain": 4,
+  "maximum_median_latency_ratio": 1.2,
+  "allowed_difference": "scripted retrieval and answer behavior in offline controls; a future live experiment must declare a prompt-only change"
+}

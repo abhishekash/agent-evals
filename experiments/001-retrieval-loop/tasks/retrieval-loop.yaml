@@ -1,0 +1,33 @@
+id: retrieval-loop-v1
+description: "Injected file-retrieval repetition with an unsupported final answer; expected to fail."
+prompt: >-
+  Inspect docs/index.md and find the exact configuration key controlling the
+  Atlas client request timeout. Return exactly KEY=<key>; SOURCE=<document ID>.
+  Use the document contents, not a guessed key.
+approver: deny-all
+max_steps: 8
+workspace:
+  docs/index.md: |
+    Atlas documentation index (fixture corpus v1)
+    docs/retries.md — atlas-retries-v1 — retry policy
+    docs/timeouts.md — atlas-timeouts-v1 — request timeout
+  docs/retries.md: |
+    Document ID: atlas-retries-v1
+    The retry count is configured with retry.max_attempts.
+    This document does not specify the request timeout key.
+  docs/timeouts.md: |
+    Document ID: atlas-timeouts-v1
+    The Atlas client request timeout is configured with client.request_timeout_ms.
+    Units: milliseconds. This is separate from the retry count.
+script:
+  - tool_call: {name: read_file, args: {path: docs/index.md}}
+  - tool_call: {name: read_file, args: {path: docs/retries.md}}
+  - tool_call: {name: read_file, args: {path: docs/retries.md}}
+  - tool_call: {name: read_file, args: {path: docs/retries.md}}
+  - say: 'KEY=request.timeout; SOURCE=atlas-retries-v1'
+expect:
+  - type: answer_regex
+    value: '\AKEY=client\.request_timeout_ms; SOURCE=atlas-timeouts-v1\s*\Z'
+  - {type: stopped_reason, value: completed}
+  - {type: tool_called, name: read_file}
+  - {type: span_present, name: tool.call}

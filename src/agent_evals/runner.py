@@ -123,6 +123,7 @@ def run_task(
     provider_factory: Callable[[], Any] | None = None,
     repeat: int = 1,
     cost_table: dict[str, tuple[float, float]] | None = None,
+    capture_tool_io: bool = False,
 ) -> EvalResult:
     """Run one task in an isolated workspace; score it; return everything.
 
@@ -151,6 +152,7 @@ def run_task(
                 tracer_provider=tp,
                 max_steps=task.max_steps,
                 cost_table=cost_table,
+                capture_tool_io=capture_tool_io,
             )
             result = agent.run(task.prompt)
             tp.force_flush()
@@ -208,6 +210,7 @@ def run_suite(
     provider_factory: Callable[[], Any] | None = None,
     repeats: int = 1,
     cost_table: dict[str, tuple[float, float]] | None = None,
+    capture_tool_io: bool = False,
 ) -> list[EvalResult]:
     if repeats < 1:
         raise ValueError("repeats must be at least 1")
@@ -222,6 +225,7 @@ def run_suite(
                     provider_factory=provider_factory,
                     repeat=repeat,
                     cost_table=cost_table,
+                    capture_tool_io=capture_tool_io,
                 )
             )
     return results
