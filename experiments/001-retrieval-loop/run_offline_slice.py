@@ -7,6 +7,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from bundle_helper import export, readiness
+
 HERE = Path(__file__).resolve().parent
 
 
@@ -43,8 +45,22 @@ def main():
                                       "--baseline", str(baseline), "--candidate", str(candidate)))
         if decision["decision"] != "mechanism_only":
             raise RuntimeError(f"{runtime}: scripted comparison must remain mechanism_only")
+        task_path = HERE / "tasks/retrieval-loop.yaml"
+        bundles = {}
+        for label, source in (("baseline", baseline), ("passing-control", candidate)):
+            first_trace = (source / "traces/retrieval-loop-v1.jsonl" if runtime == "harness"
+                           else source / "trial-1/trace.jsonl")
+            bundles[label] = root / f"{label}-bundle"
+            export(bundles[label], first_trace, task_path, source / "results.json",
+                   source / "manifest.json", HERE / "protocol.json" if label == "baseline" else None)
+        bundle_report = readiness(bundles["baseline"], bundles["baseline"], bundles["passing-control"])
+        if (bundle_report["operations"]["inspect_retrieval"]["status"] != "ready"
+                or bundle_report["operations"]["draft_regression"]["status"] != "conditional"
+                or bundle_report["operations"]["compare_experiments"].get("decision") != "mechanism_only"):
+            raise RuntimeError(f"{runtime}: bundle readiness did not match controlled evidence")
         summary["runtimes"][runtime] = {
             "inspection": inspection["operations"],
+            "bundle_readiness": bundle_report["operations"],
             "draft_review_status": json.loads((draft_dir / "REVIEW.json").read_text())["review_status"],
             "comparison": decision,
         }

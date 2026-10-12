@@ -131,12 +131,53 @@ python experiments/001-retrieval-loop/run_offline_slice.py \
 ```
 
 This produces `SUMMARY.json`, 20 scripted runs per arm for each runtime,
-review-pending drafts, and a `mechanism_only` comparison under `protocol.json`.
+review-pending drafts, copied baseline/passing-control bundles, and a
+`mechanism_only` comparison under `protocol.json`.
 A new directory is required on each run. See [PILOT.md](PILOT.md) for an
 independent-user walkthrough; it is prepared but has not been conducted.
 The comparison threshold can be met by a scripted control while **no live-model
 fix is verified**. Neither a time-saving claim nor a separate evidence
 standard is supported by these runs.
+
+## Local portable evidence helper
+
+The offline slice writes `<runtime>/baseline-bundle` and
+`<runtime>/passing-control-bundle`. Each contains an existing trace export,
+the authored task (including the selected fixture corpus), result records, and
+SHA-256 references in `manifest.json`. The baseline bundle also includes the
+predeclared protocol. Move or copy both directories to another machine and run:
+
+```bash
+python experiments/001-retrieval-loop/bundle_helper.py check \
+  /tmp/retrieval-offline-slice-001/harness/baseline-bundle \
+  --baseline /tmp/retrieval-offline-slice-001/harness/baseline-bundle \
+  --candidate /tmp/retrieval-offline-slice-001/harness/passing-control-bundle
+```
+
+For a single control, export explicitly (use a new output directory):
+
+```bash
+python experiments/001-retrieval-loop/bundle_helper.py export \
+  --trace /tmp/retrieval-control-001/baseline/traces/retrieval-loop-v1.jsonl \
+  --task experiments/001-retrieval-loop/tasks/retrieval-loop.yaml \
+  --results /tmp/retrieval-control-001/baseline/results.json \
+  --out /tmp/retrieval-bundle-001
+python experiments/001-retrieval-loop/bundle_helper.py check /tmp/retrieval-bundle-001
+```
+
+The three readiness operations are independent: inspection requires correlated
+calls and complete observed retrieval I/O; drafting also requires a matching
+outcome and an authored fixture, then stays `conditional` until engineer review;
+comparison requires two complete trial sets, matching identities, and an included
+protocol. The comparison's `ready` status means the inputs can be evaluated,
+not that a model fix succeeded: scripted controls return `mechanism_only`.
+Missing or modified artifacts, symlinks, and paths outside a bundle root block
+readiness. The manifest's capture labels are informational; checks recompute
+readiness from the included bytes. Capture is opt-in and includes unredacted
+document text in this fixture; review before sharing. This helper exports only
+authored local fixtures and does not replay recorded tools or execute bundle
+content. The first included trace corresponds to one run; repeated outcomes are
+carried in `results.json`, not as individual trace artifacts.
 
 ## Next gates
 

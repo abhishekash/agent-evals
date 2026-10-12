@@ -2,6 +2,7 @@
 import importlib.util
 import json
 import os
+import shutil
 import subprocess
 import sys
 from dataclasses import replace
@@ -19,6 +20,13 @@ spec.loader.exec_module(control)
 checker_spec = importlib.util.spec_from_file_location("retrieval_evidence", EXPERIMENT / "evidence_check.py")
 evidence = importlib.util.module_from_spec(checker_spec)
 checker_spec.loader.exec_module(evidence)
+bundle_spec = importlib.util.spec_from_file_location("retrieval_bundle", EXPERIMENT / "bundle_helper.py")
+bundle = importlib.util.module_from_spec(bundle_spec)
+sys.path.insert(0, str(EXPERIMENT))
+try:
+    bundle_spec.loader.exec_module(bundle)
+finally:
+    sys.path.remove(str(EXPERIMENT))
 
 
 def test_baseline_fails_on_outcome_not_execution(tmp_path):
@@ -247,3 +255,99 @@ def test_readiness_rejects_uncorrelated_calls(tmp_path):
     report = evidence.check(trace)
     assert report["operations"]["inspect_retrieval"]["status"] == "blocked"
     assert not report["capture"]["tool_arguments"]
+
+
+def test_exported_bundle_is_portable_and_incomplete_copy_blocks_drafting(tmp_path):
+    from agent_evals.report import write_results_json
+
+    baseline, _ = control.control_tasks()
+    result = run_task(baseline, tmp_path, capture_tool_io=True)
+    results = tmp_path / "results.json"
+    write_results_json([result], results, "scripted")
+    source = tmp_path / "bundle"
+    bundle.export(source, tmp_path / f"{baseline.id}.jsonl",
+                  EXPERIMENT / "tasks/retrieval-loop.yaml", results)
+    moved = tmp_path / "moved"
+    shutil.move(source, moved)
+    report = bundle.readiness(moved)
+    assert report["operations"]["inspect_retrieval"]["status"] == "ready"
+    assert report["operations"]["draft_regression"]["status"] == "conditional"
+    assert report["operations"]["compare_experiments"]["status"] == "blocked"
+    assert report["identity"]["trace_id"] == result.trace_id
+
+    incomplete = tmp_path / "incomplete"
+    shutil.copytree(moved, incomplete)
+    trace = incomplete / "trace.jsonl"
+    spans = [json.loads(line) for line in trace.read_text().splitlines()]
+    for span in spans:
+        if span["name"] == "tool.call":
+            span["attributes"].pop("tool.result", None)
+    trace.write_text("\n".join(json.dumps(s) for s in spans) + "\n")
+    manifest_path = incomplete / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["artifacts"]["trace"]["sha256"] = bundle.digest(trace.read_bytes())
+    manifest_path.write_text(json.dumps(manifest))
+    restricted = bundle.readiness(incomplete)
+    assert restricted["operations"]["inspect_retrieval"]["status"] == "blocked"
+    assert restricted["operations"]["draft_regression"]["status"] == "blocked"
+    assert restricted["operations"]["compare_experiments"]["status"] == "blocked"
+
+
+def test_bundle_rejects_tampering_traversal_and_symlinks(tmp_path):
+    from agent_evals.report import write_results_json
+
+    baseline, _ = control.control_tasks()
+    result = run_task(baseline, tmp_path, capture_tool_io=True)
+    results = tmp_path / "results.json"
+    write_results_json([result], results, "scripted")
+    source = tmp_path / "bundle"
+    bundle.export(source, tmp_path / f"{baseline.id}.jsonl",
+                  EXPERIMENT / "tasks/retrieval-loop.yaml", results)
+    for label in ("tampered", "traversal", "symlink"):
+        target = tmp_path / label
+        shutil.copytree(source, target)
+        if label == "tampered":
+            (target / "task.yaml").write_text("altered")
+        elif label == "traversal":
+            manifest = json.loads((target / "manifest.json").read_text())
+            manifest["artifacts"]["task"]["path"] = "../task.yaml"
+            (target / "manifest.json").write_text(json.dumps(manifest))
+        else:
+            (target / "task.yaml").unlink()
+            (target / "task.yaml").symlink_to(EXPERIMENT / "tasks/retrieval-loop.yaml")
+        report = bundle.readiness(target)
+        assert all(op["status"] == "blocked" for op in report["operations"].values())
+
+
+def test_bundle_comparison_needs_complete_protocol_and_trials(tmp_path):
+    proc = subprocess.run([sys.executable, str(EXPERIMENT / "run_control.py"),
+                           "--out", str(tmp_path / "runs"), "--repeats", "20"],
+                          capture_output=True, text=True, env=os.environ.copy())
+    assert proc.returncode == 0, proc.stderr
+    roots = {}
+    for arm in ("baseline", "passing-control"):
+        origin = tmp_path / "runs" / arm
+        roots[arm] = tmp_path / (arm + "-bundle")
+        bundle.export(roots[arm], origin / "traces/retrieval-loop-v1.jsonl",
+                      EXPERIMENT / "tasks/retrieval-loop.yaml", origin / "results.json",
+                      origin / "manifest.json",
+                      EXPERIMENT / "protocol.json" if arm == "baseline" else None)
+    baseline = roots["baseline"]
+    candidate = roots["passing-control"]
+    good = bundle.readiness(baseline, baseline, candidate)
+    assert good["operations"]["compare_experiments"]["status"] == "ready"
+    assert good["operations"]["compare_experiments"]["decision"] == "mechanism_only"
+
+    partial = tmp_path / "partial"
+    shutil.copytree(candidate, partial)
+    results = partial / "results.json"
+    data = json.loads(results.read_text())
+    data["results"].pop()
+    results.write_text(json.dumps(data))
+    manifest_path = partial / "manifest.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["artifacts"]["results"]["sha256"] = bundle.digest(results.read_bytes())
+    manifest_path.write_text(json.dumps(manifest))
+    limited = bundle.readiness(baseline, baseline, partial)
+    assert limited["operations"]["compare_experiments"]["status"] == "blocked"
+    assert limited["operations"]["compare_experiments"]["decision"] == "insufficient_evidence"
