@@ -12,7 +12,7 @@
 | Will a human correction change the side effect? | `edited-write` checks the executed path after argument editing. |
 | Will a runaway loop stop within its budget? | `step-budget` asserts the stop reason and step limit; `token-budget` checks the token limit. |
 | Can a failed run be diagnosed later? | Every task writes a trace ID and JSONL spans alongside its score. |
-| Did a tool failure preserve a useful diagnostic? | Regression tasks assert the error is queryable through [mcp-trace-inspector](https://github.com/abhishekash/mcp-trace-inspector). |
+| Did a tool failure preserve a useful diagnostic? | Regression tasks assert the error is queryable through [SpanHound](https://github.com/abhishekash/spanhound). |
 
 These are **runtime contract tests**. The checked-in 8/8 result uses a scripted provider, so it does not measure how often a live model chooses the right action.
 
@@ -198,17 +198,17 @@ the agent attempts `cat ../outside.txt`. The harness blocks the path before the
 command runs, records the bounded error on the `tool.call` span, and feeds the
 error back to the agent. The debugging finding was that the old trace only
 showed that `run_shell` was called; it did not preserve the returned tool error,
-so an operator could not diagnose the failed action through mcp-trace-inspector. The
+so an operator could not diagnose the failed action through SpanHound. The
 harness now adds `tool.result_status` and a bounded `tool.error_message`, and
 the regression asserts both the safety outcome and its observability.
 
 The sequence is reproducible:
 
-[mcp-trace-inspector](https://github.com/abhishekash/mcp-trace-inspector) `0.3.0` is currently available from its Git tag while PyPI publication is pending:
+[SpanHound](https://github.com/abhishekash/spanhound) is available on PyPI:
 
 ```bash
 agent-evals run --tasks tasks/regressions --provider scripted --out /tmp/harness-regression
-uvx --from git+https://github.com/abhishekash/mcp-trace-inspector@v0.3.0 mcp-trace-inspector --trace-dir /tmp/harness-regression/traces
+uvx spanhound --trace-dir /tmp/harness-regression/traces
 ```
 
 From an MCP client, the useful queries are:
