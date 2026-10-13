@@ -204,9 +204,11 @@ the regression asserts both the safety outcome and its observability.
 
 The sequence is reproducible:
 
+[mcp-trace-inspector](https://github.com/abhishekash/mcp-trace-inspector) `0.3.0` is currently available from its Git tag while PyPI publication is pending:
+
 ```bash
 agent-evals run --tasks tasks/regressions --provider scripted --out /tmp/harness-regression
-uvx agenthawk --trace-dir /tmp/harness-regression/traces
+uvx --from git+https://github.com/abhishekash/mcp-trace-inspector@v0.3.0 mcp-trace-inspector --trace-dir /tmp/harness-regression/traces
 ```
 
 From an MCP client, the useful queries are:
